@@ -10,25 +10,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import com.example.firstproject.repository.ArticleRepository;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.util.Optional;
 
 @Controller
 @Slf4j
+@RequestMapping("/articles")
 public class ArticleController {
 
     @Autowired
     private ArticleRepository articleRepository;
 
-    @GetMapping("articles/new") // 글 작성 폼
+    @GetMapping("/new") // 글 작성 폼
     public String newArticleForm() {
 
         log.info("New article form");
         return "articles/new";
     }
 
-    @PostMapping("/articles/create") // 글 등록 처리
+    @PostMapping("/create") // 글 등록 처리
     public String createArticle(ArticleForm form) {
         log.info("New article created");
         log.info("article form: {}", form);
@@ -43,7 +45,7 @@ public class ArticleController {
         return "redirect:/articles/" + saved.getId();
     }
 
-    @GetMapping("/articles/{id}") // 글 상세 보기
+    @GetMapping("/{id}") // 글 상세 보기
     public String show(@PathVariable("id") Long id, Model model) {
         log.info("Show article");
 
@@ -60,7 +62,7 @@ public class ArticleController {
         return "articles/show";
     }
 
-    @GetMapping("/articles") // 글 목록 보기
+    @GetMapping("") // 글 목록 보기
     public String index(Model model) {
 
         // 1. 모든 데이터 가져오기
@@ -73,5 +75,12 @@ public class ArticleController {
 
         // 3. 뷰 페이지 설정하기
         return "articles/index";
+    }
+
+    // /articles/{{article.id}}/edit
+    @GetMapping("/{id}/edit")
+    public String edit(@PathVariable("id")Long id){
+
+        return "articles/edit";
     }
 }
