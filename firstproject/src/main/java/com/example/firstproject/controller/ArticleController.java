@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import com.example.firstproject.repository.ArticleRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
@@ -78,10 +79,52 @@ public class ArticleController {
     }
 
     // /articles/{{article.id}}/edit
-    // update get 요청
+    // localhost:8080/articles/2/edit  -> 이렇게 요청하면 edit() 메소드가 응답
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable("id")Long id){
+    public String edit(@PathVariable("id")Long id, Model model) {
+
+        // 1. 수정할 데이터 가져오기
+        Article articleEntity = articleRepository.findById(id).orElse(null);
+
+        // 2. 모델에 데이터 등록하기
+        model.addAttribute("article", articleEntity);
 
         return "articles/edit";
+    }
+
+    @PostMapping("/update")
+    public String updateArticle(ArticleForm form) {
+
+        log.info("Update article : {}", form);
+
+        // 1. DTO를 엔티티로 변환하기
+        Article articleEntity = form.toEntity();
+
+        // 2. 엔티티를 DB에 저장하기
+        Article target = articleRepository.findById(articleEntity.getId()).orElse(null);
+
+        if(target != null) {
+            articleRepository.save(articleEntity);
+        }
+
+        // 3. 수정 결과 페이지로 리다이렉트하기
+        return "redirect:/articles/" + articleEntity.getId();
+    }
+
+    // localhost:8080/articles/2/delete  -> 이렇게 요청하면 delete() 메소드가 응답
+    @GetMapping("/{id}/delete")
+    public String delete(@PathVariable("id")Long id, RedirectAttributes redirectAttributes) {
+
+        // 1. 삭제할 데이터 가져오기
+        Article target = articleRepository.findById(id).orElse(null);
+
+        // 2. 대상 엔티티 삭제하기
+        if(target != null) {
+            articleRepository.delete(target);
+            redirectAttributes.addFlashAttribute("msg", "삭제되었습니다!");
+        }
+
+        // 3. 결과 페이지로 리다이렉트하기 (리스트 화면으로 리다이렉트)
+        return "redirect:/articles";
     }
 }
