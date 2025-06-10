@@ -78,6 +78,7 @@ public class ArticleController {
     }
 
     // /articles/{{article.id}}/edit
+    // update 요청
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable("id")Long id){
 
