@@ -19,9 +19,20 @@ public class Article {
     private Long id; // 기본키
 
     @Column
+    // (nullable=false) 여기에 이걸 적으면 null값을 허용하지 않는 것이기 때문에
+    // 제목에 null값이 있으면 에러남
     private String title;
 
     private String content;
 
 
+    public void patch(Article article) {
+        if(article.title != null) {
+            this.title = article.title;
+        }
+
+        if(article.content != null) {
+            this.content = article.content;
+        }
+    }
 }
